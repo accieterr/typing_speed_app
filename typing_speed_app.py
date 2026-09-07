@@ -20,11 +20,11 @@ def generate_prompt(numWords):
 def run_test(stdscr):
     #text colors
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_RED)
     curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
     stdscr.clear()
-    stdscr.addstr("How many words would you like on the test?\n1. 15 words\n2. 30 words\n3. 60 words\n")
+    stdscr.addstr("How many words would you like on the test?\n1. 15 words\n2. 30 words\n")
     numWords = 0
     while True:
         user_key = stdscr.getkey()
@@ -33,9 +33,6 @@ def run_test(stdscr):
             break
         elif ord(user_key) == ord('2'):
             numWords = 30
-            break
-        elif ord(user_key) == ord('3'):
-            numWords = 60
             break
 
     prompt = generate_prompt(numWords)
