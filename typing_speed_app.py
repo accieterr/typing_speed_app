@@ -63,7 +63,7 @@ def run_test(stdscr):
         stdscr.addstr(6, 0, f"ACCURACY: {accuracy*100:.2f}%")
 
         stdscr.move(2, len(user_input))
-
+        
         try:
             user_key = stdscr.getkey()
         except:
