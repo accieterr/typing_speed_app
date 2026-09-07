@@ -4,40 +4,6 @@ import random
 import curses
 from curses import wrapper
 
-def run_test(stdscr):
-    #text colors
-    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-    curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
-
-    stdscr.clear()
-
-    #generates prompt and prints
-    prompt = generate_prompt()
-    stdscr.addstr(f"Type the following sentence and press ENTER afterwards:\n\n{prompt}\n")
-    user_input = []
-    start_time = time.time()
-    while True:
-        user_key = stdscr.getkey()
-        stdscr.addstr(user_key)
-        if ord(user_key) == ord("\n"):
-            break 
-        user_input.append(user_key)
-    
-    end_time = time.time()
-
-
-    user_input = "".join(user_input)
-    stdscr.addstr(f"\nTime it took: {end_time-start_time:.2f} seconds\n")
-    correct = 0
-    for letter_a, letter_b in zip(prompt, user_input):
-        if letter_a == letter_b:
-            correct += 1
-    
-    accuracy = correct/len(prompt)
-    stdscr.addstr(f"Accuracy: {accuracy*100:.2f}%")
-    
-
 def generate_prompt():
     #loads 300 most common english words from JSON file
     with open("en_300.json", "r") as file:
@@ -51,6 +17,50 @@ def generate_prompt():
     #returns prompt string
     return ' '.join(words) 
 
+def run_test(stdscr):
+    #text colors
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
+    prompt = generate_prompt()
+    start_time = time.time()
+    user_input = []
+    
+    while True:
+        stdscr.clear()
+        stdscr.addstr(f"Type the following sentence and press ENTER afterwards:\n\n{prompt}")
+        correct = 0
+
+        for i in range(len(user_input)):
+            if i >= len(prompt) or prompt[i] != user_input[i]:
+                stdscr.addstr(2, i, user_input[i], curses.color_pair(2))
+            else:
+                correct += 1
+                stdscr.addstr(2, i, user_input[i], curses.color_pair(1))
+        
+        stdscr.refresh()
+
+        user_key = stdscr.getkey()
+        end_time = time.time()
+        if ord(user_key) == ord("\n"):
+            break 
+        if user_key in ("KEY_BACKSPACE", '\b', "\x7f"):
+            if len(user_input) > 0:
+                user_input.pop()
+        else:
+            user_input.append(user_key)
+    
+    # user_input = "".join(user_input)
+    # stdscr.addstr(f"\nTime it took: {end_time-start_time:.2f} seconds\n")
+    # correct = 0
+    # for letter_a, letter_b in zip(prompt, user_input):
+    #     if letter_a == letter_b:
+    #         correct += 1
+    
+    # accuracy = correct/len(prompt)
+    # stdscr.addstr(f"Accuracy: {accuracy*100:.2f}%")
+    
 def main(stdscr):
     while True:
         stdscr.clear()
