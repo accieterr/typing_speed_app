@@ -23,6 +23,8 @@ def run_test(stdscr):
     curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
 
+    stdscr.nodelay(True)
+
     prompt = generate_prompt()
     start_time = time.time()
     user_input = []
@@ -38,11 +40,21 @@ def run_test(stdscr):
             else:
                 correct += 1
                 stdscr.addstr(2, i, user_input[i], curses.color_pair(1))
-        
-        stdscr.refresh()
 
-        user_key = stdscr.getkey()
         end_time = time.time()
+        elapsed_time_min = ((max((end_time-start_time), 1))/60)
+        raw_wpm = (len(user_input)/5) / elapsed_time_min
+        accuracy = correct/max(1 , min(len(user_input), len(prompt)))
+        wpm = max(0 , raw_wpm - ((len(user_input)-correct) / elapsed_time_min))
+        stdscr.addstr(4, 0, f"NET WPM: {wpm:.0f} wpm")
+        stdscr.addstr(5, 0, f"RAW WPM: {raw_wpm:.0f} wpm")
+        stdscr.addstr(6, 0, f"ACCURACY: {accuracy*100:.2f}%")
+
+        try:
+            user_key = stdscr.getkey()
+        except:
+            continue
+        
         if ord(user_key) == ord("\n"):
             break 
         if user_key in ("KEY_BACKSPACE", '\b', "\x7f"):
@@ -50,16 +62,12 @@ def run_test(stdscr):
                 user_input.pop()
         else:
             user_input.append(user_key)
+
+    stdscr.nodelay(False)
+
+    stdscr.addstr(8, 0, "Press any key to continue...")
+    stdscr.getkey()
     
-    # user_input = "".join(user_input)
-    # stdscr.addstr(f"\nTime it took: {end_time-start_time:.2f} seconds\n")
-    # correct = 0
-    # for letter_a, letter_b in zip(prompt, user_input):
-    #     if letter_a == letter_b:
-    #         correct += 1
-    
-    # accuracy = correct/len(prompt)
-    # stdscr.addstr(f"Accuracy: {accuracy*100:.2f}%")
     
 def main(stdscr):
     while True:
